@@ -6,12 +6,12 @@ using namespace std;
 
 void first(int n) {
     int a[n],b[n],c[n];
-#pragma parallel omp for private(i)
+#pragma omp parallel for
     for(int i = 0; i < n; i++){
         a[i] = rand()%100;
         b[i] = rand()%100;
     }
-#pragma parallel omp for private(i)
+#pragma omp parallel for
     for(int i = 0; i < n; i++){
         c[i] = a[i] * b[i];
         printf("a[%d]=%d\tb[%d]=%d\tc[%d]=%d\n",i,a[i],i,b[i],i,c[i]);
@@ -20,14 +20,14 @@ void first(int n) {
 
 void second(int n, int m) {
     int a[n][m],b[n][m],c[n][m];
-#pragma parallel omp for private(i)
+#pragma omp parallel for
     for(int i = 0; i < n; i++){
         for(int j = 0; j < m; j++){
             a[i][j] = rand()%100;
             b[i][j] = rand()%100;
         }
     }
-#pragma parallel omp for private(i)
+#pragma omp parallel for
     for(int i = 0; i < n; i++){
         for(int j = 0; j < m; j++){
             c[i][j] = a[i][j] + b[i][j];
@@ -39,7 +39,7 @@ void second(int n, int m) {
 void third(int x,int y,int z) {
     int a[x][y],b[y][z],c[x][z];
     int d = (x>y)?(x>z)?x:z:(y>z)?y:z;
-#pragma parallel omp for private(i)
+#pragma omp parallel for
     for(int i=0; i<d; i++){
         for(int j=0; j<d; j++){
             if(i < x && j < y){
@@ -50,7 +50,7 @@ void third(int x,int y,int z) {
             }
         }
     }
-#pragma parallel omp for private(i)
+#pragma omp parallel for
     for(int i = 0; i<x; i++){
         for(int j = 0; j < z; j++){
             c[i][j] = 1;
@@ -66,13 +66,13 @@ void third(int x,int y,int z) {
 void four(int n) {
     int a[n],b[n];
     int sum = 0;
-#pragma parallel omp for private(i)
+#pragma omp parallel for
     for(int i=0; i<n; i++){
         a[i] = rand()%100;
         b[i] = rand()%100;
         printf("a[%d]=%d\tb[%d]=%d\n",i,a[i],i,b[i]);
     }
-#pragma parallel omp for private(i) reduction(+;sum)
+#pragma omp parallel for reduction(+:sum)
     for(int i = 0; i<n; i++){
         sum += a[i] * b[i];
     }
