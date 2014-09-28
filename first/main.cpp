@@ -5,7 +5,9 @@
 using namespace std;
 
 void first(int n) {
-    int a[n],b[n],c[n];
+    int *a = new int[n];
+    int *b = new int[n];
+    int *c = new int[n];
 #pragma omp parallel for
     for(int i = 0; i < n; i++){
         a[i] = rand()%100;
@@ -16,12 +18,20 @@ void first(int n) {
         c[i] = a[i] * b[i];
         printf("a[%d]=%d\tb[%d]=%d\tc[%d]=%d\n",i,a[i],i,b[i],i,c[i]);
     }
+    delete []a;
+    delete []b;
+    delete []c;
 }
 
 void second(int n, int m) {
-    int a[n][m],b[n][m],c[n][m];
+    int **a = new int*[n];
+    int **b = new int *[n];
+    int **c = new int*[n];
 #pragma omp parallel for
     for(int i = 0; i < n; i++){
+        a[i] = new int[m];
+        b[i] = new int[m];
+        c[i] = new int[m];
         for(int j = 0; j < m; j++){
             a[i][j] = rand()%100;
             b[i][j] = rand()%100;
@@ -33,14 +43,29 @@ void second(int n, int m) {
             c[i][j] = a[i][j] + b[i][j];
             printf("a[%d][%d]=%d\tb[%d][%d]=%d\tc[%d][%d]=%d\n",i,j,a[i][j],i,j,b[i][j],i,j,c[i][j]);
         }
+        delete []a[i];
+        delete []b[i];
+        delete []c[i];
     }
+    delete []a;
+    delete []b;
+    delete []c;
 }
 
 void third(int x,int y,int z) {
-    int a[x][y],b[y][z],c[x][z];
+    int **a = new int*[x];
+    int **b = new int*[y];
+    int **c = new int*[x];
     int d = (x>y)?(x>z)?x:z:(y>z)?y:z;
 #pragma omp parallel for
     for(int i=0; i<d; i++){
+        if(i < x){
+            a[i] = new int[y];
+            c[i] = new int[z];
+        }
+        if(i < y){
+            b[i] = new int[z];
+        }
         for(int j=0; j<d; j++){
             if(i < x && j < y){
                 a[i][j] = rand()%100;
@@ -60,11 +85,19 @@ void third(int x,int y,int z) {
             }
             printf("c[%d][%d]=%d\n",i,j,c[i][j]);
         }
+        delete []a[i];
+        delete []c[i];
     }
+#pragma omp parallel for
+    for (int i = 0; i < y; i++) delete b[i];
+    delete []a;
+    delete []b;
+    delete []c;
 }
 
 void four(int n) {
-    int a[n],b[n];
+    int *a = new int[n];
+    int *b = new int[n];
     int sum = 0;
 #pragma omp parallel for
     for(int i=0; i<n; i++){
@@ -77,6 +110,8 @@ void four(int n) {
         sum += a[i] * b[i];
     }
     cout<<"Сумма ="<<sum<<endl;
+    delete []a;
+    delete []b;
 }
 char flag;
 int main() {
