@@ -3,17 +3,24 @@
 #include <stdio.h>
 
 using namespace std;
+char flag;
+#define LIMIT 100
 
+/*Взять любую программу с первой лабораторной работы
+и используя #pragma omp parallel for if() написать соответствующую программу*/
 void first(int n) {
+
     int *a = new int[n];
     int *b = new int[n];
     int *c = new int[n];
-#pragma omp parallel for
-    for(int i = 0; i < n; i++){
-        a[i] = rand()%100;
-        b[i] = rand()%100;
-    }
-#pragma omp parallel for
+/*N>LIMIT где N вводится с клавиатуры, LIMIT это define переменная 100*/
+#pragma omp parallel for if (n > LIMIT)
+        for (int i = 0; i < n; i++) {
+            a[i] = rand() % 100;
+            b[i] = rand() % 100;
+        }
+    /*Если N кратно 2 то область распараллеливается, иначе последовательный код*/
+#pragma omp parallel for if(n % 2 == 0)
     for(int i = 0; i < n; i++){
         c[i] = a[i] * b[i];
         printf("a[%d]=%d\tb[%d]=%d\tc[%d]=%d\n",i,a[i],i,b[i],i,c[i]);
@@ -113,7 +120,6 @@ void four(int n) {
     delete []a;
     delete []b;
 }
-char flag;
 int main() {
     do{
         cout<<"Введите номер функции:"<< endl;
