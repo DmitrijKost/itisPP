@@ -1,16 +1,17 @@
 #include <iostream>
-#include <sstream>
 #include <vector>
 #include <omp.h>
+#include <math.h>
 
 
 using namespace std;
 
-string dToS(double h){
-    ostringstream ss;
-    ss << h;
-    return ss.str();
+double f(double x)
+{
+    return sin(x)+2*cos(2*x);
+
 }
+
 
 void printV(vector<int> myV){
     for(int i = 0; i<myV.size(); i++){
@@ -26,46 +27,32 @@ void integral(float a, float b, int n) {
                 "other - exit\n";
         char next;
         double h = (b - a) / n;
-        cin >> next;
-        cout << h << "*(";
+        double result = 0;
+        cin>>next;
         switch (next) {
             case 'a':
-#pragma omp parallel
-            {
-                string result = "";
-#pragma omp for
+#pragma omp parallel for reduction(+:result)
                 for (int i = 0; i < n; i++) {
-                    result += "f(" + dToS(a + i * h) + ")+";
+                    result += f(a + i * h);
                 };
-                cout << result;
-            }
                 break;
             case 'b':
-#pragma omp parallel
-            {
-                string result = "";
-#pragma omp for
+#pragma omp parallel for reduction(+:result)
                 for (int i = 1; i <= n; i++) {
-                    result += "f(" + dToS(a + i * h) + ")+";
+                    result += f(a + i * h);
                 };
-                cout << result;
-            }
+
                 break;
             case 'c':
-#pragma omp parallel
-            {
-                string result = "";
-#pragma omp for
+#pragma omp parallel for reduction(+:result)
                 for (int i = 1; i <= n; i++) {
-                    result += "f(" + dToS(a + (i - 0.5) * h) + ")+";
+                    result += f(a + (i - 0.5) * h);
                 };
-                cout << result;
-            }
                 break;
                 default:
-                    cout << "0)\n";return;
+                    return;
         }
-        cout << "0)\n";
+        cout << result<<endl;
     }
 
 }
