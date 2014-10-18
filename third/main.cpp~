@@ -26,7 +26,7 @@ void first(){
     for(int i = 0; i < n; i++) {
         int sum = 0;
         for (int j = 0; j < m; j++) {
-            if (i % 2 == a[i][j] % 2) {
+            if (i % 2 == j % 2) {
                 sum += a[i][j];
             }
         }
