@@ -18,8 +18,10 @@ int main(int ac, char** av){
             cout<<a[i]<<"\t ";
         }
         cout<<endl;
-        for(int i = 1; i<size; i++) {
-            MPI_Send(&a[(trash > 0)?amount%size - trash+i*sizeBuf:amount%size+i*sizeBuf],(trash-- > 0)?sizeBuf + 1:sizeBuf, MPI_INT, i, 0, MPI_COMM_WORLD);
+        for(int i = 1; i<size; i++,trash--) {
+            int index = (trash > 0)?amount%size - trash+i*sizeBuf:amount%size+i*sizeBuf;
+            int count = (trash > 0)?sizeBuf + 1:sizeBuf;
+            MPI_Send(&a[index],count, MPI_INT, i, 0, MPI_COMM_WORLD);
         }
         for(int i=0; i<sizeBuf; i++){
             printf("Процесс %d элемент %d: %d\n",rank,i,a[i]);
