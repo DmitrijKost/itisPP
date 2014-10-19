@@ -6,18 +6,18 @@ int main(int ac, char** av){
     MPI_Init (&ac, &av);
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
     MPI_Comm_size (MPI_COMM_WORLD, &size);
-    if(size > 2 && rank == 1){
+    if(size > 1 && rank == 1){
         sizeBuf = rand()%20;
         int *a = new int[sizeBuf];
         for(int i=0; i<sizeBuf; i++){
-            a[i] = rand()%100;
+            a[i] = rand()%100-50;
         }
         MPI_Send(a, sizeBuf, MPI_INT, 0, 0, MPI_COMM_WORLD);
         for(int i=2; i<size; i++) {
             MPI_Send(a, sizeBuf, MPI_INT, i, 0, MPI_COMM_WORLD);
         }
         delete []a;
-    } else if(size > 2){
+    } else if(size > 1){
         MPI_Status status;
         MPI_Probe(1, 0, MPI_COMM_WORLD, &status);
         MPI_Get_count(&status, MPI_INT, &sizeBuf);
