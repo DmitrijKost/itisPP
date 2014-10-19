@@ -22,7 +22,7 @@ int main(int ac, char** av){
         MPI_Probe(1, 0, MPI_COMM_WORLD, &status);
         MPI_Get_count(&status, MPI_INT, &sizeBuf);
         int *a = new int[sizeBuf];
-        MPI_Recv(a, sizeBuf, MPI_INT, 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Recv(a, sizeBuf, MPI_INT, 1, 0, MPI_COMM_WORLD, &status);
         for(int i=0; i<sizeBuf; i++){
             printf("Process %d\tvalue = %d\n",rank,a[i]);
         }
