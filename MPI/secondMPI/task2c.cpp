@@ -11,15 +11,16 @@ int main(int ac, char** av){
     //TAGS
     int A = 1;
     int COUNT=4;
+    int INDEX = 666;
     int N = 0;
     int RES = 3;
 
     //Variable
-    int size,rank,sizeBuf,n, **a,**b;
+    int size,rank,sizeBuf,n, **a,**b,index;
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
     MPI_Comm_size (MPI_COMM_WORLD, &size);
     if(rank == 0){
-        int trash, index, count;
+        int trash, count;
         cout<<"Введите размерность матрицы n:\n";
         cin>>n;
         sizeBuf = n/(size-1);
@@ -42,8 +43,9 @@ int main(int ac, char** av){
             index = (trash > 0)?n%(size-1) - trash+(i-1)*sizeBuf:n%(size-1)+(i-1)*sizeBuf;
             count = (trash > 0)?sizeBuf + 1:sizeBuf;
             MPI_Send(&n,1, MPI_INT, i, N, MPI_COMM_WORLD);
+            MPI_Send(&index,1, MPI_INT, i, INDEX, MPI_COMM_WORLD);
             MPI_Send(&count,1, MPI_INT, i, COUNT, MPI_COMM_WORLD);
-            for (int j = index; j < index + count; ++j) {
+            for (int j = 0; j < n; ++j) {
                 MPI_Send(&a[j][0],n, MPI_INT, i, A, MPI_COMM_WORLD);
             }
         }
@@ -65,26 +67,25 @@ int main(int ac, char** av){
         }
     } else {
         MPI_Recv(&n, 1, MPI_INT, 0, N, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Recv(&index, 1, MPI_INT, 0, INDEX, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         MPI_Recv(&sizeBuf, 1, MPI_INT, 0, COUNT, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        a = new int*[sizeBuf];
+        a = new int*[n];
         b = new int*[n];
-        for (int i = 0; i < sizeBuf; ++i) {
+        for (int i = 0; i < n; ++i) {
             a[i] = new int[n];
             b[i] = new int[sizeBuf];
             MPI_Recv(&a[i][0], n, MPI_INT, 0, A, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         }
-        for (int i = sizeBuf; i < n; ++i) {
-            b[i] = new int[sizeBuf];
-        }
-        for(int i=0; i<sizeBuf; i++){
-            for (int j = 0; j < n; ++j) {
-                b[j][i] = a[i][j];
+        for (int k = 0; k < n; ++k) {
+            for(int i=0; i<sizeBuf; i++){
+                for (int j = 0; j < n; ++j) {
+                    b[k][i] += a[index+i][j]*a[k][j];
+                }
             }
-            delete []a[i];
         }
         for (int i = 0; i < n; ++i) {
             MPI_Send(&b[i][0], sizeBuf, MPI_INT, 0, RES, MPI_COMM_WORLD);
-            delete []b[i];
+            delete []b[i],a[i];
         }
     }
     delete []a,b;

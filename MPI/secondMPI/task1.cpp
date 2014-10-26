@@ -10,12 +10,13 @@ int main(int ac, char** av){
     int FLAG = 0;
     int ALPHA = 1;
     int BETA = 2;
+    int GAMMA = 6;
     int A = 3;
     int B = 4;
     int RES = 5;
 
     //Variable
-    int size,rank,sizeBuf,*a,*b,*z,flag, alpha, beta;
+    int size,rank,sizeBuf,*a,*b,*z,flag, alpha, beta, gamma;
     MPI_Init (&ac, &av);
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
     MPI_Comm_size (MPI_COMM_WORLD, &size);
@@ -26,8 +27,8 @@ int main(int ac, char** av){
         cout<<"Выберите задание(1, 2, 3 или 4):\n";
         cin>>flag;
         if(flag > 0 && flag < 3) {
-            cout << "Введите alpha,beta:\n";
-            cin >> alpha >> beta;
+            cout << "Введите alpha,beta,gamma:\n";
+            cin >> alpha >> beta>>gamma;
         }
         sizeBuf = amount/(size-1);
         trash = amount%(size-1);
@@ -46,6 +47,7 @@ int main(int ac, char** av){
             if(flag > 0 && flag < 3){
                 MPI_Send(&alpha,1, MPI_INT, i, ALPHA, MPI_COMM_WORLD);
                 MPI_Send(&beta,1, MPI_INT, i, BETA, MPI_COMM_WORLD);
+                MPI_Send(&gamma,1, MPI_INT, i, GAMMA, MPI_COMM_WORLD);
             }
             MPI_Send(&a[index],count, MPI_INT, i, A, MPI_COMM_WORLD);
             MPI_Send(&b[index],count, MPI_INT, i, B, MPI_COMM_WORLD);
@@ -104,6 +106,7 @@ int main(int ac, char** av){
         if(flag > 0 && flag < 3){
             MPI_Recv(&alpha, 1, MPI_INT, 0, ALPHA, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             MPI_Recv(&beta, 1, MPI_INT, 0, BETA, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            MPI_Recv(&gamma, 1, MPI_INT, 0, GAMMA, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         }
         MPI_Probe(0, A, MPI_COMM_WORLD, &status);
         MPI_Get_count(&status, MPI_INT, &sizeBuf);
@@ -115,20 +118,20 @@ int main(int ac, char** av){
             case 1:
                 z = new int[sizeBuf];
                 for(int i=0; i<sizeBuf; i++){
-                    z[i] = alpha*a[i] + beta*b[i];
+                    z[i] = alpha*a[i] + beta*b[i] + gamma;
                 }
                 MPI_Send(z, sizeBuf, MPI_INT, 0, RES, MPI_COMM_WORLD);
                 break;
             case 2:
                 for(int i=0; i<sizeBuf; i++){
-                    b[i] = alpha*a[i] + beta*b[i];
+                    b[i] = alpha*a[i] + beta*b[i] + gamma;
                 }
                 MPI_Send(b, sizeBuf, MPI_INT, 0, RES, MPI_COMM_WORLD);
                 break;
             case 3:
                 z = new int[sizeBuf];
                 for(int i=0; i<sizeBuf; i++){
-                    z[i] = a[i] * b[i];
+                    z[i] = a[i] * b[i] * gamma;
                 }
                 MPI_Send(z, sizeBuf, MPI_INT, 0, RES, MPI_COMM_WORLD);
                 break;
