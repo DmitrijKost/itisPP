@@ -49,7 +49,9 @@ int main(int ac,char **av) {
             }
         };
         printf("Min=%f\nIndex=%d\n",min.value,min.index);
+        delete []x;
     }
+    delete []sendCounts,indexes,rBuf;
     MPI_Finalize();
 #undef AMOUNT
 }
